@@ -124,7 +124,7 @@ def Lu(u0):
     fl=numerical_flux(u0)
     return (fl[1:N+2]-fl[0:N+1])/dx
 
-def eno3_interpolation_left(um2,um1,u,up1,up2):
+def eno3_interpolation_left(um2,um1,u,up1,up2,oprtr):
     # This function only caculate u_{i-1/2}^{-}
     # Same function will be used to calculate u_{i-1/2}^{+}
     ENO3_COEF= [[0.375,-1.25,1.875],[-0.125,0.75,0.375],[0.375,0.75,-0.125]] #ENO coefficient generally denoted as c_{ij} 
@@ -142,17 +142,17 @@ def eno3_interpolation_left(um2,um1,u,up1,up2):
     s = eno_level-1;
     # Calculation of smoothness indicator r
     for i in range(1,eno_level):
-        if(abs(dd[i,s-r]) > abs(dd[i,s-r-1])):
-            r=r+1
+        if oprtr(abs(dd[i,s-r]), abs(dd[i,s-r-1])):
+            r+=1
     # Finally calculate the reconstruction sum(c_{ij}u_{..}) 
     for i in range(0,eno_level):
-        ul =ul+ ENO3_COEF[s-r][i]*state[s-r+i];
+        ul+= ENO3_COEF[s-r][i]*state[s-r+i];
     return ul
 def eno3_interpolation(um3,um2,um1,u,up1,up2):
     # This is the main function which will take 6 input values
     # and provide you the reconstructed values u_{i-1/2}^{\pm}   
-    ul=eno3_interpolation_left(um3,um2,um1,u,up1)
-    ur=eno3_interpolation_left(up2,up1,u,um1,um2)
+    ul=eno3_interpolation_left(um3,um2,um1,u,up1,operator.gt) # operator.gt is used to do the comparison of divided difference
+    ur=eno3_interpolation_left(up2,up1,u,um1,um2,operator.ge) # if operator.gt is from left then operator.ge is from right
     return ul,ur
 ## Main Code
 N=200 # number of cells
