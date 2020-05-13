@@ -1,7 +1,9 @@
+# The original theory behind the code can be found in https://epubs.siam.org/doi/abs/10.1137/110836961
 #from IPython import get_ipython
 #get_ipython().magic('reset -sf')
 import numpy as np
 import matplotlib.pyplot as plt
+import operator
 
 # All functions related to Linear equation 
 class Linear:
